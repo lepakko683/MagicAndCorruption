@@ -1,5 +1,6 @@
 package celestibytes.magicandcorruption.pre;
 
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 
@@ -27,7 +28,24 @@ public class ASMCalls {
 		return String.valueOf(stack.stackSize);
 	}
 	
-	public static void debugOutput(int id) { // celestibytes/magicandcorruption/pre debugOutput (I)V false
+	/** returns false if the provided stack got empty and therefore we can "break" out of the loop */
+	public static boolean splitStackInSlot(Slot slot, ItemStack stack) {
+		int slotLimit = slot.getSlotStackLimit();
+		if(stack.stackSize > slotLimit) {
+			slot.putStack(stack.splitStack(slotLimit));
+			slot.onSlotChanged();
+		} else {
+			slot.putStack(stack.copy());
+			slot.onSlotChanged();
+			stack.stackSize = 0;
+			
+			return true;
+		}
+		
+		return false;
+	}
+	
+	public static void debugOutput(int id) { // celestibytes/magicandcorruption/ASMCalls debugOutput (I)V false
 		switch(id) {
 		case 0:
 			System.out.println("nosend");

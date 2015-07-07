@@ -16,8 +16,9 @@ public class LoadingPlugin implements IFMLLoadingPlugin {
 			"celestibytes.magicandcorruption.asm.cts.CT_PacketBuffer",
 			"celestibytes.magicandcorruption.asm.cts.CT_RenderItem",
 			"celestibytes.magicandcorruption.asm.cts.CT_NetHandlerPlayServer",
-			"celestibytes.magicandcorruption.asm.cts.CT_DebugOutput"//,
-			//"celestibytes.magicandcorruption.asm.cts.CT_InventoryBasic"
+			"celestibytes.magicandcorruption.asm.cts.CT_DebugOutput",
+			//"celestibytes.magicandcorruption.asm.cts.CT_InventoryBasic",
+			"celestibytes.magicandcorruption.asm.cts.CT_Container"
 		};
 	}
 
@@ -40,5 +41,4 @@ public class LoadingPlugin implements IFMLLoadingPlugin {
 	public String getAccessTransformerClass() {
 		return null;
 	}
-
 }
