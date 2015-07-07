@@ -132,14 +132,14 @@ public class CT_Container extends ClassTransformer {
 								System.out.println("[Magic and Corruption - CT: Container] success");
 								byte[] ret = getNewBytes(cn);
 								
-								try {
-									File out = new File("/home/okkapel/Programming/Minecraft/MagicAndCorruption/container.class");
-									DataOutputStream dos = new DataOutputStream(new FileOutputStream(out));
-									dos.write(ret);
-									dos.close();
-								} catch(Exception e) {
-									e.printStackTrace();
-								}
+//								try {
+//									File out = new File("/home/okkapel/Programming/Minecraft/MagicAndCorruption/container.class");
+//									DataOutputStream dos = new DataOutputStream(new FileOutputStream(out));
+//									dos.write(ret);
+//									dos.close();
+//								} catch(Exception e) {
+//									e.printStackTrace();
+//								}
 								
 								return ret;
 							}
