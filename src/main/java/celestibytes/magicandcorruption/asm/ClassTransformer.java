@@ -3,6 +3,9 @@ package celestibytes.magicandcorruption.asm;
 import java.util.Iterator;
 import java.util.List;
 
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import net.minecraft.launchwrapper.IClassTransformer;
@@ -24,9 +27,30 @@ public abstract class ClassTransformer implements IClassTransformer {
 		return basicClass;
 	}
 	
-	public abstract byte[] transform(String name, String transformedName, byte[] classBytes, boolean obfuscated);
+	public abstract byte[] transform(String name, String srgName, byte[] classBytes, boolean obfuscated);
 	
-	protected MethodNode findMethod(String methodName, String methodDesc, List<MethodNode> methods) {
+//	protected MethodNode findMethod(String methodName, String methodDesc, List<MethodNode> methods) {
+//		Iterator<MethodNode> iter = methods.iterator();
+//		
+//		while(iter.hasNext()) {
+//			MethodNode mtd = iter.next();
+//			if(mtd.name.equals(methodName) && mtd.desc.equals(methodDesc)) {
+//				return mtd;
+//			}
+//		}
+//		
+//		return null;
+//	}
+	
+	public static ClassNode getClassNode(byte[] classBytes) {
+		ClassReader cr = new ClassReader(classBytes);
+		ClassNode ret = new ClassNode();
+		cr.accept(ret, 0);
+		
+		return ret;
+	}
+	
+	public static MethodNode findMethod(String methodName, String methodDesc, List<MethodNode> methods) {
 		Iterator<MethodNode> iter = methods.iterator();
 		
 		while(iter.hasNext()) {
@@ -37,6 +61,26 @@ public abstract class ClassTransformer implements IClassTransformer {
 		}
 		
 		return null;
+	}
+	
+	public static MethodNode findMethod(String methodName, String methodDesc, ClassNode cn) {
+		Iterator<MethodNode> iter = cn.methods.iterator();
+		
+		while(iter.hasNext()) {
+			MethodNode mtd = iter.next();
+			if(mtd.name.equals(methodName) && mtd.desc.equals(methodDesc)) {
+				return mtd;
+			}
+		}
+		
+		return null;
+	}
+	
+	public static byte[] getNewBytes(ClassNode cn) {
+		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+		cn.accept(cw);
+		
+		return cw.toByteArray();
 	}
 
 }

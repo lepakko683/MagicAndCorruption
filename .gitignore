@@ -15,3 +15,11 @@ LICENSE-fml.txt
 MinecraftForge-License.txt
 MinecraftForge-Credits.txt
 CREDITS-fml.txt
+
+# Scripts
+findObfName
+
+# Misc
+obfuscation_notes
+src/main/java/celestibytes/magicandcorruption/asm/cts/CT_InventoryBasic.java
+

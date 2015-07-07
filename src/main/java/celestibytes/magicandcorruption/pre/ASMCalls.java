@@ -26,4 +26,17 @@ public class ASMCalls {
 		
 		return String.valueOf(stack.stackSize);
 	}
+	
+	public static void debugOutput(int id) { // celestibytes/magicandcorruption/pre debugOutput (I)V false
+		switch(id) {
+		case 0:
+			System.out.println("nosend");
+			break;
+		case 1:
+			System.out.println("sendContainerAndContentsToPlayer");
+			break;
+		default:
+			System.out.println("unknown code: " + id);
+		}
+	}
 }

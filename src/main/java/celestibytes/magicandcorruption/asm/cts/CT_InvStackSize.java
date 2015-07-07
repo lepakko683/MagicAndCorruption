@@ -34,7 +34,8 @@ public class CT_InvStackSize implements IClassTransformer {
 	
 	private static final TransfInv[] transformedInventories = {
 		new TransfInv("net.minecraft.entity.player.InventoryPlayer", "getInventoryStackLimit", "d", CT_Item.MAX_STACK_SIZE),
-		new TransfInv("net.minecraft.tileentity.TileEntityChest", "getInventoryStackLimit", "d", CT_Item.MAX_STACK_SIZE)
+		new TransfInv("net.minecraft.tileentity.TileEntityChest", "getInventoryStackLimit", "d", CT_Item.MAX_STACK_SIZE),
+		new TransfInv("net.minecraft.inventory.InventoryBasic", "getInventoryStackLimit", "d", CT_Item.MAX_STACK_SIZE)
 	};
 
 	@Override
