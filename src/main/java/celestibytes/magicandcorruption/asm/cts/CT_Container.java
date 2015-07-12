@@ -117,7 +117,7 @@ public class CT_Container extends ClassTransformer {
 										insn = insn2;
 										break;
 									} else {
-										System.out.println("remove: " + insn2.getClass().getName());
+//										System.out.println("remove: " + insn2.getClass().getName());
 										mtd.instructions.remove(insn2);
 									}
 								}

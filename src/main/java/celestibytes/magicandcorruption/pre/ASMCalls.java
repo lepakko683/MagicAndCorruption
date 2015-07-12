@@ -1,8 +1,13 @@
 package celestibytes.magicandcorruption.pre;
 
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.world.World;
 
 public class ASMCalls {
 	
@@ -40,6 +45,61 @@ public class ASMCalls {
 			stack.stackSize = 0;
 			
 			return true;
+		}
+		
+		return false;
+	}
+	
+	public static void handleCycleExtraItems(ItemStack[] stacks, World world, EntityPlayer plr) {
+		System.out.println("Call!");
+		if(stacks.length > 1) {
+			for(int i = 1; i < stacks.length; i++) {
+				if(stacks[i] != null) {
+					System.out.println("extra stack size: " + stacks[i].stackSize + ", name: " + stacks[i].getDisplayName() + ", meta: " + stacks[i].getItemDamage());
+				}
+				//if(!plr.inventory.addItemStackToInventory(stacks[i].copy())) {
+				if(!addExtraStack(stacks[i].copy(), plr)) {
+					EntityItem item = new EntityItem(world, plr.posX, plr.posY + plr.eyeHeight/2f, plr.posZ, stacks[i]);
+					world.spawnEntityInWorld(item);
+				}
+			}
+		}
+	}
+	
+	private static boolean addExtraStack(ItemStack stack, EntityPlayer plr) { // TODO!
+		InventoryPlayer inv = plr.inventory;
+		
+		for(int i = 0; i < inv.mainInventory.length; i++) {
+			if(i != inv.currentItem) {
+				ItemStack is = inv.mainInventory[i];
+				if(is != null) {
+					if(is.getItem() == stack.getItem() && is.getItemDamage() == stack.getItemDamage() && ItemStack.areItemStacksEqual(is, stack)) {
+						int space = Math.min(is.getMaxStackSize(), inv.getInventoryStackLimit()) - is.stackSize;
+						if(space > 0) {
+							int add = Math.min(space, stack.stackSize);
+							stack.stackSize -= add;
+							is.stackSize += add;
+							
+							if(stack.stackSize <= 0) {
+								return true;
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		for(int i = 0; i < inv.mainInventory.length; i++) {
+			if(i != inv.currentItem) {
+				if(inv.mainInventory[i] == null) {
+					int put = Math.min(stack.stackSize, inv.getInventoryStackLimit());
+					inv.mainInventory[i] = stack.splitStack(put);
+					
+					if(stack.stackSize <= 0) {
+						return true;
+					}
+				}
+			}
 		}
 		
 		return false;
