@@ -10,4 +10,12 @@ public class Ref {
 		public static final String BLOCK_CRAFTING_TABLE = "mco_crafting_table";
 		public static final String BLOCK_COMPOST = "mco_compost";
 	}
+	
+	public static class ItemNames {
+		public static final String ITEM_CRAFTING_GUIDE = "crafting_guide";
+	}
+	
+	public static enum Guis {
+		CRAFTING_GUIDE;
+	}
 }

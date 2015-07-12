@@ -18,7 +18,8 @@ public class LoadingPlugin implements IFMLLoadingPlugin {
 			"celestibytes.magicandcorruption.asm.cts.CT_NetHandlerPlayServer",
 			"celestibytes.magicandcorruption.asm.cts.CT_DebugOutput",
 			//"celestibytes.magicandcorruption.asm.cts.CT_InventoryBasic",
-			"celestibytes.magicandcorruption.asm.cts.CT_Container"
+			"celestibytes.magicandcorruption.asm.cts.CT_Container",
+			"celestibytes.magicandcorruption.asm.cts.CT_TextureMap"
 		};
 	}
 
