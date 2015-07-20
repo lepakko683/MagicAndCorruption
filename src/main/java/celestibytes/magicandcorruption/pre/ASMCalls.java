@@ -113,6 +113,12 @@ public class ASMCalls {
 		case 1:
 			System.out.println("sendContainerAndContentsToPlayer");
 			break;
+		case 2:
+			System.out.println("stepassist on");
+			break;
+		case 3:
+			System.out.println("stepassist off");
+			break;
 		default:
 			System.out.println("unknown code: " + id);
 		}

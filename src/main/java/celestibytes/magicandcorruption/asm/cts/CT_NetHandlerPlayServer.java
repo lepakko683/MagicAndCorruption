@@ -42,18 +42,38 @@ public class CT_NetHandlerPlayServer extends ClassTransformer {
 								mtd.instructions.insertBefore(bipush, new MethodInsnNode(Opcodes.INVOKEVIRTUAL, obfuscated ? "add" : "net/minecraft/item/ItemStack", obfuscated ? "e" : "getMaxStackSize", "()I", false));
 								mtd.instructions.remove(bipush);
 								
-								ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-								cn.accept(cw);
-								
-								System.out.println("[Magic and Corruption - CT: NetHandlerPlayServer] success");
-								return cw.toByteArray();
+								break;
 							}
 						}
 					}
 				}
 			}
 		}
-		System.out.println("[Magic and Corruption - CT: NetHandlerPlayServer] fail");
+		
+		mtd = findMethod(obfuscated ? "a" : "processEntityAction", obfuscated ? "(Ljj;)V" : "(Lnet/minecraft/network/play/client/C0BPacketEntityAction;)V", cn);
+		if(mtd != null) {
+			int found = 0;
+			Iterator<AbstractInsnNode> iter = mtd.instructions.iterator();
+			while(iter.hasNext()) {
+				AbstractInsnNode insn = iter.next();
+				if(insn.getOpcode() == Opcodes.INVOKEVIRTUAL) {
+					MethodInsnNode min = (MethodInsnNode) insn;
+					if(min.desc.equals("(Z)V") && min.name.equals(obfuscated ? "b" : "setSneaking") && min.owner.equals(obfuscated ? "mw" : "net/minecraft/entity/player/EntityPlayerMP")) {
+						mtd.instructions.insert(min, new MethodInsnNode(Opcodes.INVOKESTATIC, "celestibytes/magicandcorruption/pre/network/NetworkHelper", "syncStepHeight", obfuscated ? "(Lmw;)V" : "(Lnet/minecraft/entity/player/EntityPlayerMP;)V", false));
+						mtd.instructions.insert(min, new FieldInsnNode(Opcodes.GETFIELD, obfuscated ? "nh" : "net/minecraft/network/NetHandlerPlayServer", obfuscated ? "b" : "playerEntity", obfuscated ? "Lmw;" : "Lnet/minecraft/entity/player/EntityPlayerMP;"));
+						mtd.instructions.insert(min, new VarInsnNode(Opcodes.ALOAD, 0));
+						
+						found++;
+						if(found == 2) {
+							System.out.println("[Magic and Corruption - CT: NetHandlerPlayServer] success");
+							return getNewBytes(cn);
+						}
+					}
+				}
+			}
+		}
+		
+ 		System.out.println("[Magic and Corruption - CT: NetHandlerPlayServer] fail");
 		return classBytes;
 	}
 

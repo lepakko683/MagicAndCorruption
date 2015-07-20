@@ -1,5 +1,8 @@
 package celestibytes.magicandcorruption.asm;
 
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.Iterator;
 import java.util.List;
 
@@ -81,6 +84,17 @@ public abstract class ClassTransformer implements IClassTransformer {
 		cn.accept(cw);
 		
 		return cw.toByteArray();
+	}
+	
+	public static void writeClassFile(String fname, byte[] classBytes) {
+		try {
+			File out = new File(fname);
+			DataOutputStream dos = new DataOutputStream(new FileOutputStream(out));
+			dos.write(classBytes);
+			dos.close();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }

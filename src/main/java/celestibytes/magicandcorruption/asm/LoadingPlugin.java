@@ -8,7 +8,7 @@ public class LoadingPlugin implements IFMLLoadingPlugin {
 
 	@Override
 	public String[] getASMTransformerClass() {
-		MagicAndCorruption_ASM.isObfuscatedEnv();
+		MagicAndCorruption_ASM.isObfuscatedEnv(); // needed to prevent ClassCircularityException (Causes net.minecraft.world.World to be cl'd if in deobfuscated env)
 		return new String[] {
 			"celestibytes.magicandcorruption.asm.cts.CT_ItemStack",
 			"celestibytes.magicandcorruption.asm.cts.CT_Item",
@@ -19,7 +19,9 @@ public class LoadingPlugin implements IFMLLoadingPlugin {
 			"celestibytes.magicandcorruption.asm.cts.CT_DebugOutput",
 			//"celestibytes.magicandcorruption.asm.cts.CT_InventoryBasic",
 			"celestibytes.magicandcorruption.asm.cts.CT_Container",
-			"celestibytes.magicandcorruption.asm.cts.CT_TextureMap"
+			"celestibytes.magicandcorruption.asm.cts.CT_TextureMap",
+			"celestibytes.magicandcorruption.asm.cts.CT_EntityPlayer",
+			"celestibytes.magicandcorruption.asm.cts.natura.CT_NContent"
 		};
 	}
 

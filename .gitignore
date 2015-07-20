@@ -1,6 +1,7 @@
 run/
 bin/
 src__/
+modUnpack/
 *.jar
 *.class
 .classpath

@@ -1,13 +1,20 @@
 package celestibytes.magicandcorruption.pre;
 
+import com.jcraft.jorbis.Block;
+
+import celestibytes.magicandcorruption.pre.crafting.RecipesTools;
+import celestibytes.magicandcorruption.pre.handler.LivingUpdate;
 import celestibytes.magicandcorruption.pre.handler.StackCycles;
 import celestibytes.magicandcorruption.pre.init.ModBlocks;
+import celestibytes.magicandcorruption.pre.init.ModItems;
+import celestibytes.magicandcorruption.pre.network.PacketHandler;
 import celestibytes.magicandcorruption.pre.proxy.CommonProxy;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -15,6 +22,8 @@ import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.registry.GameData;
+import cpw.mods.fml.common.registry.GameRegistry;
 
 @Mod(modid = Ref.MOD_ID, name = Ref.MOD_NAME, version = Ref.VERSION)
 public class MagicAndCorruptionPre {
@@ -22,7 +31,7 @@ public class MagicAndCorruptionPre {
 	@Instance(Ref.MOD_ID)
 	public MagicAndCorruptionPre INSTANCE;
 	
-	@SidedProxy(clientSide="celestibytes.magicandcorruption.pre.proxy.ClientProxy", serverSide="celestibytes.magicandcorruption.pre.proxy.CommonProxy")
+	@SidedProxy(clientSide = Ref.PROXY_CLIENT, serverSide = Ref.PROXY_SERVER)
 	public static CommonProxy proxy;
 	
 	public static CreativeTabs creativeTab = new CreativeTabs(Ref.MOD_ID) {
@@ -36,10 +45,17 @@ public class MagicAndCorruptionPre {
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent e) {
 		ModBlocks.init();
+		ModItems.init();
+		
+		PacketHandler.init();
 	}
 	
 	@EventHandler
 	public void init(FMLInitializationEvent e) {
+//		MinecraftForge.EVENT_BUS.register(new LivingUpdate());
+		
+		RecipesTools.init();
+		
 		StackCycles.registerCycle(new ItemStack(Blocks.cobblestone), new ItemStack(Blocks.stone_slab, 2, 3), new ItemStack(Blocks.stone_stairs, -2, 0), new ItemStack(Blocks.cobblestone));
 		StackCycles.registerCycle(new ItemStack(Blocks.quartz_block), new ItemStack(Blocks.quartz_block, 1, 1), new ItemStack(Blocks.quartz_block, 1, 2), new ItemStack(Blocks.stone_slab, 2, 7), new ItemStack(Blocks.quartz_stairs, -2), new ItemStack(Blocks.quartz_block));
 		StackCycles.registerCycle(new ItemStack(Blocks.nether_brick), new ItemStack(Blocks.stone_slab, 2, 6), new ItemStack(Blocks.nether_brick_stairs, -2), new ItemStack(Blocks.nether_brick));

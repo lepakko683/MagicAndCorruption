@@ -14,6 +14,4 @@ public class ItemCraftingGuide extends Item {
 	public String getUnlocalizedName() {
 		return "item." + Ref.MOD_ID + ":" + super.getUnlocalizedName().substring(5);
 	}
-	
-	
 }
