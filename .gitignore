@@ -4,6 +4,7 @@ src__/
 modUnpack/
 *.jar
 *.class
+*.javap
 .classpath
 .project
 .settings/
