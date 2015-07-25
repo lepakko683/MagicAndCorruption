@@ -1,32 +1,27 @@
 package celestibytes.magicandcorruption.pre.crafting;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import akka.util.Collections;
-import celestibytes.magicandcorruption.pre.Ref;
+import celestibytes.magicandcorruption.pre.handler.ToolHelper;
 import celestibytes.magicandcorruption.pre.init.ModItems;
-import celestibytes.magicandcorruption.pre.item.ItemMcoPickaxe;
+import celestibytes.magicandcorruption.pre.item.IMcoTool;
 import celestibytes.magicandcorruption.pre.util.BlockPos;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryCrafting;
-import net.minecraft.item.Item.ToolMaterial;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 
-public class RecipesTools { // Tinker's Construct - Okkapel683 edition ;)
+public class RecipesTools { // Tinker's Tools - Okkapel683 edition ;)
 	
 	private static Map<String, IToolMod> modLookup = new HashMap<String, IToolMod>();
 	
@@ -77,18 +72,28 @@ public class RecipesTools { // Tinker's Construct - Okkapel683 edition ;)
 		}
 	}
 	
+	public static CraftingStack getCSForMaterial(McoToolMaterial mat, List<CraftingStack> css) {
+		for(CraftingStack cs : css) {
+			if(cs.material.equals(mat)) {
+				return cs;
+			}
+		}
+		
+		return null;
+	}
+	
 	public static interface IToolMod {
 		
 		/** Dominating mod, can't be applied to a tool if a mod of the same type already exists,
 		 *  nor can any other (even non dominant) mods of the same type be applied.
-		 *  Tool materials' mods are always dominant. */
+		 */
 		public static final int FLAG_DOMINANT       = 0x00000001;
 		
 		/** This mod handles drops from blocks. */
 		public static final int FLAG_MOD_DROP       = 0x00000002; // ? - Auto Smelt
 		
 		/** This mod does extra stuff when a block is mined. */
-		public static final int FLAG_MOD_MINE       = 0x00000004; // Lapis - Fortune(adds fortune enchantment, 64 lapis - I, 128 lapis - II, 256 lapis - III), Sugar / Redstone / Cookies / Cake / Speed Potion - efficiency; 16 = I / 8 x 9 = II / 64 = III /
+		public static final int FLAG_MOD_MINE       = 0x00000004; // Lapis - Fortune(adds fortune enchantment, 64 lapis - I, 192 lapis - II, 448 lapis - III), Sugar / Redstone / Cookies / Cake / Speed Potion - efficiency; 16 = I / 8 x 9 = II / 64 = III / ? / ?
 		
 		/** This mod handles repairing. */
 		public static final int FLAG_MOD_REPAIR     = 0x00000008; // Blood Moss - Repair with LP, Soul-Touched Gem - repair with Soul Power/Energy, Moss - repair over time, Sparkling Moss - greater repair over time, ? - repair with vis, easy repair; repair with normal crafting (without an anvil)
@@ -98,31 +103,40 @@ public class RecipesTools { // Tinker's Construct - Okkapel683 edition ;)
 		public static final int FLAG_MOD_SPEED_MULT = 0x00000080;
 		public static final int FLAG_MOD_ENCH_FLAT  = 0x00000100;
 		public static final int FLAG_MOD_ENCH_MULT  = 0x00000200;
+		public static final int FLAG_MOD_DMG_FLAT   = 0x00000400;
+		public static final int FLAG_MOD_DMG_MULT   = 0x00000800;
 		
 		
 		/** A method to add extra info to the tool tip. */
+		@SuppressWarnings("rawtypes")
 		public void addInformation(ItemStack stack, List info);
 		
 		/** Returns a list of items to be dropped normally at the mined block. */
 		public List<ItemStack> onBlockDrops(ItemStack stack, World world, EntityPlayer plr, List<ItemStack> drops, BlockPos block);
 		
-		/** Returns a list of blocks to be broken, if possible. */
+		/** Returns a list of additional blocks to be broken. */
 		public List<BlockPos> onBlockMined(ItemStack stack, World world, EntityPlayer plr, BlockPos block);
 		
 		/** This gets called on every inv update for the tool to apply any repairing. */
 		public void onRepairTick(ItemStack stack, EntityPlayer plr);
 		
-		public int getAddedDurability(ItemStack stack);
+		public int getDurabFlat(ItemStack stack);
+		public float getDurabMult(ItemStack stack);
 		
-		public float getDurabilityMultiplier(ItemStack stack);
+		public float getSpeedFlat(ItemStack stack);
+		public float getSpeedMult(ItemStack stack);
+		
+		public int getEnchFlat(ItemStack stack);
+		public float getEnchMult(ItemStack stack);
 		
 		/** Modifier id, not actual modid. */
 		public String getModId();
 		
+		public int getFlags();
+		
 	}
 	
 	public static abstract class McoToolMaterial implements IToolMod {
-		
 		public final int flags;
 		public final String modId;
 		
@@ -141,6 +155,25 @@ public class RecipesTools { // Tinker's Construct - Okkapel683 edition ;)
 			this.flags = flags | FLAG_DOMINANT;
 		}
 		
+		/** return -1 if not a valid repair material */
+		public abstract int getRepairAmount(ItemStack tool, ItemStack repairStack);
+		
+		public abstract boolean isPrimaryRepairMaterial(ItemStack repairStack);
+		
+		@Override
+		public String getModId() {
+			return modId;
+		}
+		
+		@Override
+		public int getFlags() {
+			return flags;
+		}
+		
+		public int getHarvestLevel() {
+			return 0;
+		}
+		
 		@Override
 		@SuppressWarnings("rawtypes")
 		public void addInformation(ItemStack stack, List info) {}
@@ -156,8 +189,41 @@ public class RecipesTools { // Tinker's Construct - Okkapel683 edition ;)
 	
 	public static class McoSimpleMaterial extends McoToolMaterial {
 		
+		private static class RepairStack {
+			public final ItemStack stack;
+			public final int amount;
+			public final float amountf;
+			
+			public RepairStack(ItemStack stack, int amount) {
+				this.stack = stack;
+				this.amount = amount;
+				this.amountf = 0f;
+			}
+			
+			public RepairStack(ItemStack stack, float amount) {
+				this.stack = stack;
+				this.amount = -1;
+				this.amountf = amount;
+			}
+			
+			public int getRepairAmount(ItemStack tool) {
+				if(amount == -1) {
+					return (int) Math.ceil(((float)ToolHelper.getDurability(tool)) * amountf);
+				}
+				
+				return amount;
+			}
+			
+			public boolean equals(ItemStack repairStack) {
+				return isSameMaterial(stack, repairStack);
+			}
+		}
+		
+		private final List<RepairStack> repairStacks = new LinkedList<RepairStack>();
+		
 		private float enchMult = 1f, durabMult = 1f, speedMult = 1f, speedFlat = 1;
 		private int enchFlat = 0, durabFlat = 0;
+		private int harvestLevel = 0;
 
 		public McoSimpleMaterial(String modId, int flags) {
 			super(modId, flags);
@@ -193,24 +259,76 @@ public class RecipesTools { // Tinker's Construct - Okkapel683 edition ;)
 			return this;
 		}
 		
+		public McoSimpleMaterial setHarvestLevel(int val) {
+			this.harvestLevel = val;
+			return this;
+		}
+		
+		public McoSimpleMaterial addRepairStack(ItemStack repairStack, int repairAmount) {
+			repairStacks.add(new RepairStack(repairStack, repairAmount));
+			return this;
+		}
+		
+		public McoSimpleMaterial addRepairStack(ItemStack repairStack, float repairAmount) {
+			repairStacks.add(new RepairStack(repairStack, repairAmount));
+			return this;
+		}
+		
 		@Override
 		public List<ItemStack> onBlockDrops(ItemStack stack, World world, EntityPlayer plr, List<ItemStack> drops, BlockPos block) {
 			return drops;
 		}
 
 		@Override
-		public int getAddedDurability(ItemStack stack) {
-			return 0;
+		public int getDurabFlat(ItemStack stack) {
+			return durabFlat;
 		}
 
 		@Override
-		public float getDurabilityMultiplier(ItemStack stack) {
-			return 0;
+		public float getDurabMult(ItemStack stack) {
+			return durabMult;
 		}
 
 		@Override
-		public String getModId() {
-			return null;
+		public float getSpeedFlat(ItemStack stack) {
+			return speedFlat;
+		}
+
+		@Override
+		public float getSpeedMult(ItemStack stack) {
+			return speedMult;
+		}
+
+		@Override
+		public int getEnchFlat(ItemStack stack) {
+			return enchFlat;
+		}
+
+		@Override
+		public float getEnchMult(ItemStack stack) {
+			return enchMult;
+		}
+		
+		@Override
+		public int getHarvestLevel() {
+			return harvestLevel;
+		}
+		
+		@Override
+		public int getRepairAmount(ItemStack tool, ItemStack repairStack) {
+			for(RepairStack rs : repairStacks) {
+				if(rs.equals(repairStack)) {
+					return rs.getRepairAmount(tool);
+				} else {
+					System.out.println("not equal: " + tool.getItem() + " : " + repairStack.getItem());
+				}
+			}
+			return -1;
+		}
+		
+		@Override
+		public boolean isPrimaryRepairMaterial(ItemStack repairStack) {
+			return repairStacks.size() >= 1 ? repairStacks.get(0).equals(repairStack) : false;
 		}
 		
 	}
@@ -222,6 +340,10 @@ public class RecipesTools { // Tinker's Construct - Okkapel683 edition ;)
 	public static boolean registerPickHeadMaterial(ItemStack mat, McoToolMaterial data) {
 		if(!pickHeadMaterials.contains(mat)) {
 			pickHeadMaterials.add(new CraftingStack(mat, data));
+			if(!modLookup.containsKey(data.modId)) {
+				modLookup.put(data.modId, data);
+			}
+			
 			return true;
 		}
 		
@@ -253,13 +375,14 @@ public class RecipesTools { // Tinker's Construct - Okkapel683 edition ;)
 		registerHandleMaterial(new ItemStack(Items.stick), new McoSimpleMaterial("handle_wood", IToolMod.FLAG_MOD_DURAB_MULT | IToolMod.FLAG_MOD_SPEED_MULT).setDurabMult(1.2f).setSpeedMult(0.8f));
 		registerHandleMaterial(new ItemStack(Items.reeds), new McoSimpleMaterial("handle_reed", IToolMod.FLAG_MOD_DURAB_MULT | IToolMod.FLAG_MOD_SPEED_MULT).setDurabMult(1f).setSpeedMult(1f));
 		
-		registerPickHeadMaterial(new ItemStack(Items.flint), new McoSimpleMaterial("head_stone", IToolMod.FLAG_MOD_DURAB_FLAT | IToolMod.FLAG_MOD_SPEED_FLAT).setDurabFlat(64).setSpeedFlat(1f));
-		registerPickHeadMaterial(new ItemStack(Items.iron_ingot), new McoSimpleMaterial("head_iron", IToolMod.FLAG_MOD_DURAB_FLAT | IToolMod.FLAG_MOD_SPEED_FLAT).setDurabFlat(128).setSpeedFlat(2f));
+		registerPickHeadMaterial(new ItemStack(Items.flint), new McoSimpleMaterial("head_stone", IToolMod.FLAG_MOD_DURAB_FLAT | IToolMod.FLAG_MOD_SPEED_FLAT).setDurabFlat(64).setSpeedFlat(1f).addRepairStack(new ItemStack(Items.flint), 0.25f));
+		registerPickHeadMaterial(new ItemStack(Items.iron_ingot), new McoSimpleMaterial("head_iron", IToolMod.FLAG_MOD_DURAB_FLAT | IToolMod.FLAG_MOD_SPEED_FLAT).setDurabFlat(128).setSpeedFlat(2f).addRepairStack(new ItemStack(Items.iron_ingot), 0.25f));
 		
 		RecipePickaxe rpick = new RecipePickaxe(new ItemStack(ModItems.pickaxe));
 		if(rpick.valid) {
 			GameRegistry.addRecipe(rpick);
 		}
+		GameRegistry.addRecipe(new RecipesRepair());
 	}
 	
 	private static abstract class RecipeTool implements IRecipe {
@@ -436,9 +559,116 @@ public class RecipesTools { // Tinker's Construct - Okkapel683 edition ;)
 
 		@Override
 		public ItemStack getResult(ItemStack head, ItemStack handle) {
-			return output.copy();
+			ItemStack ret = output.copy();
+			CraftingStack cs = getCStack(head, pickHeadMaterials);
+			if(cs != null) {
+				ToolHelper.setToolMaterial(ret, cs.material);
+				ToolHelper.addModifierToTool(ret, cs.material);
+			} else {
+				System.out.println("head cstack null");
+			}
+			
+			cs = getCStack(handle, handleMaterials);
+			if(cs != null) {
+				ToolHelper.addModifierToTool(ret, cs.material);
+			} else {
+				System.out.println("handle cstack null");
+			}
+			
+			return ret;
+		}
+	}
+	
+	public static class RecipesRepair implements IRecipe {
+		
+		private ItemStack tool;
+		private int toolSlot = 0;
+
+		@Override
+		public boolean matches(InventoryCrafting cinv, World world) {
+			ItemStack tool = null;
+			
+			for(int i = 0; i < cinv.getSizeInventory(); i++) {
+				ItemStack st = cinv.getStackInSlot(i);
+				if(st != null) {
+					if(st.getItem() instanceof IMcoTool) {
+						if(tool != null) {
+							return false;
+						}
+						
+						if(ToolHelper.getDamage(st) == 0) {
+							return false;
+						}
+						
+						toolSlot = i;
+						tool = st;
+					}
+				}
+			}
+			
+			if(tool == null) {
+				return false;
+			}
+			
+			McoToolMaterial mat = ToolHelper.getRepairMaterial(tool);
+			if(mat == null) {
+				return false;
+			}
+			
+			boolean toolOnly = true;
+			
+			for(int i = 0; i < cinv.getSizeInventory(); i++) {
+				ItemStack st = cinv.getStackInSlot(i);
+				if(st != null && i != toolSlot) {
+					toolOnly = false;
+					if(mat.getRepairAmount(tool, st) == -1) {
+						return false;
+					}
+				}
+			}
+			
+			this.tool = tool;
+			return !toolOnly;
 		}
 
+		@Override
+		public ItemStack getCraftingResult(InventoryCrafting cinv) {
+			ItemStack tool = this.tool.copy();
+			McoToolMaterial mat = ToolHelper.getRepairMaterial(tool);
+			
+			boolean cutLoop = false;
+			int toRepair = ToolHelper.getDamage(tool);
+			int repairAmount = 0;
+			
+			for(int i = 0; i < cinv.getSizeInventory(); i++) {
+				ItemStack st = cinv.getStackInSlot(i);
+				if(st != null && i != toolSlot) {
+					if(cutLoop) {
+						return null;
+					}
+					repairAmount += mat.getRepairAmount(tool, st);
+					if(repairAmount >= toRepair) {
+						repairAmount = toRepair;
+						cutLoop = true;
+					}
+				}
+			}
+			
+			ToolHelper.setToolDamage(tool, toRepair - repairAmount);
+			
+			return tool;
+		}
+
+		@Override
+		public int getRecipeSize() {
+			return 10;
+		}
+
+		@Override
+		public ItemStack getRecipeOutput() {
+			return null;
+		}
+		
 	}
 	
 	public static boolean listContains(List<?> list, Object obj) {
@@ -451,6 +681,16 @@ public class RecipesTools { // Tinker's Construct - Okkapel683 edition ;)
 		}
 		
 		return false;
+	}
+	
+	public static CraftingStack getCStack(ItemStack key, List<CraftingStack> list) {
+		for(CraftingStack cs : list) {
+			if(cs.equals(key)) {
+				return cs;
+			}
+		}
+		
+		return null;
 	}
 	
 	private static boolean isSameMaterial(ItemStack a, ItemStack b) {

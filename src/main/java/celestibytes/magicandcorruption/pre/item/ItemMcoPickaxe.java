@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import celestibytes.magicandcorruption.pre.Ref;
+import celestibytes.magicandcorruption.pre.handler.ToolHelper;
 
 import com.google.common.collect.Multimap;
 
@@ -18,7 +19,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.ForgeHooks;
 
-public class ItemMcoPickaxe extends ItemPickaxe {
+public class ItemMcoPickaxe extends ItemPickaxe implements IMcoTool {
 	
 	public static IIcon handle_wood = null;
 	public static IIcon handle_reed = null;
@@ -56,7 +57,7 @@ public class ItemMcoPickaxe extends ItemPickaxe {
 	
 	@Override
 	public int getItemEnchantability(ItemStack stack) {
-		return 0; // TODO
+		return ToolHelper.getEnchantability(stack);
 	}
 	
 	@Override
@@ -66,23 +67,17 @@ public class ItemMcoPickaxe extends ItemPickaxe {
 	
 	@Override
 	public boolean getIsRepairable(ItemStack stack, ItemStack rmat) {
-		//return super.getIsRepairable(stack, rmat);
-		return false; // TODO
+		return ToolHelper.getRepairMaterial(stack).getRepairAmount(stack, rmat) != -1;
 	}
 	
 	@Override
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public Multimap getItemAttributeModifiers() {
-		Multimap map = super.getItemAttributeModifiers();
-		map.clear();
-		map.put(SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(), new AttributeModifier(field_111210_e, "Tool Modifier", 0d, 0));
-		return map;
+	public int getMaxDamage(ItemStack stack) {
+		return ToolHelper.getDurability(stack);
 	}
 	
 	@Override
 	public int getHarvestLevel(ItemStack stack, String toolClass) {
-		//return super.getHarvestLevel(stack, toolClass);
-		return 3; // TODO
+		return "pickaxe".equals(toolClass) ? ToolHelper.getHarvestLevel(stack) : 0;
 	}
 	
 	@Override
@@ -93,7 +88,8 @@ public class ItemMcoPickaxe extends ItemPickaxe {
 	@Override
 	public float getDigSpeed(ItemStack stack, Block block, int meta) {
 		if(ForgeHooks.isToolEffective(stack, block, meta)) {
-			return 8f;
+			float spd = ToolHelper.getSpeed(stack);
+			return spd;
 		}
 		
 		return 1f;
@@ -102,6 +98,15 @@ public class ItemMcoPickaxe extends ItemPickaxe {
 	@Override
 	public void addInformation(ItemStack stack, EntityPlayer plr, List info, boolean advanced) {
 		super.addInformation(stack, plr, info, advanced);
+	}
+	
+	@Override
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public Multimap getItemAttributeModifiers() {
+		Multimap map = super.getItemAttributeModifiers();
+		map.clear();
+		map.put(SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(), new AttributeModifier(field_111210_e, "Tool Modifier", 0d, 0));
+		return map;
 	}
 
 }
