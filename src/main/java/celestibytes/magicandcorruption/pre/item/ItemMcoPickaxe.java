@@ -67,7 +67,7 @@ public class ItemMcoPickaxe extends ItemPickaxe implements IMcoTool {
 	
 	@Override
 	public boolean getIsRepairable(ItemStack stack, ItemStack rmat) {
-		return ToolHelper.getRepairMaterial(stack).getRepairAmount(stack, rmat) != -1;
+		return ToolHelper.getHeadMaterial(stack).getRepairAmount(stack, rmat) != -1;
 	}
 	
 	@Override
@@ -107,6 +107,11 @@ public class ItemMcoPickaxe extends ItemPickaxe implements IMcoTool {
 		map.clear();
 		map.put(SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(), new AttributeModifier(field_111210_e, "Tool Modifier", 0d, 0));
 		return map;
+	}
+
+	@Override
+	public List<IIcon> getHeadIcons(ItemStack tool) {
+		return null;
 	}
 
 }

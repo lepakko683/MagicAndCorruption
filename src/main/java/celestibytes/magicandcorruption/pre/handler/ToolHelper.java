@@ -17,7 +17,8 @@ import net.minecraft.nbt.NBTTagString;
 
 public class ToolHelper {
 	
-	public static final String TOOL_MATERIAL = "mco_material";
+	public static final String TOOL_MATERIAL_HEAD = "mco_mat_head";
+	public static final String TOOL_MATERIAL_HANDLE = "mco_mat_handle";
 	public static final String ATTR_SPEED = "a_speed";
 	public static final String ATTR_MINING_LVL = "a_minelvl";
 	public static final String ATTR_DURABILITY = "a_durab";
@@ -25,6 +26,9 @@ public class ToolHelper {
 	public static final String ATTR_HARVEST_LVL = "a_harvlvl";
 	/** Base damage */
 	public static final String ATTR_DAMAGE = "a_dmg";
+	
+	public static final String ATTR_CACHE_ICON_HEAD = "c_icon_head";
+	public static final String ATTR_CACHE_ICON_HANDLE = "c_icon_handle";
 	
 	
 	@SuppressWarnings("rawtypes")
@@ -78,14 +82,21 @@ public class ToolHelper {
 	}
 	
 	/** Used when determining the correct repair material. */
-	public static void setToolMaterial(ItemStack tool, McoToolMaterial mat) {
+	public static void setToolMaterial(ItemStack tool, McoToolMaterial head, McoToolMaterial handle) {
 		NBTTagCompound nbt = getNBT(tool);
-		nbt.setString(TOOL_MATERIAL, mat.modId);
+		nbt.setString(TOOL_MATERIAL_HEAD, head.modId);
+		nbt.setString(TOOL_MATERIAL_HANDLE, handle.modId);
 	}
 	
-	public static McoToolMaterial getRepairMaterial(ItemStack tool) {
+	public static McoToolMaterial getHeadMaterial(ItemStack tool) {
 		NBTTagCompound nbt = getNBT(tool);
-		IToolMod mat = RecipesTools.getModifier(nbt.getString(TOOL_MATERIAL));
+		IToolMod mat = RecipesTools.getModifier(nbt.getString(TOOL_MATERIAL_HEAD));
+		return mat != null ? (McoToolMaterial) mat : null;
+	}
+	
+	public static McoToolMaterial getHandleMaterial(ItemStack tool) {
+		NBTTagCompound nbt = getNBT(tool);
+		IToolMod mat = RecipesTools.getModifier(nbt.getString(TOOL_MATERIAL_HANDLE));
 		return mat != null ? (McoToolMaterial) mat : null;
 	}
 	
@@ -119,7 +130,7 @@ public class ToolHelper {
 			toolNBT.setInteger(ATTR_DURABILITY, calcDurability(tool));
 			toolNBT.setFloat(ATTR_SPEED, calcSpeed(tool));
 			toolNBT.setInteger(ATTR_ENCHANTABILITY, calcEnchantability(tool));
-			McoToolMaterial mat = getRepairMaterial(tool);
+			McoToolMaterial mat = getHeadMaterial(tool);
 			toolNBT.setInteger(ATTR_HARVEST_LVL, mat != null ? mat.getHarvestLevel() : 0);
 		}
 	}

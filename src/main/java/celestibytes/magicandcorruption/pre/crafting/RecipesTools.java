@@ -560,19 +560,14 @@ public class RecipesTools { // Tinker's Tools - Okkapel683 edition ;)
 		@Override
 		public ItemStack getResult(ItemStack head, ItemStack handle) {
 			ItemStack ret = output.copy();
-			CraftingStack cs = getCStack(head, pickHeadMaterials);
-			if(cs != null) {
-				ToolHelper.setToolMaterial(ret, cs.material);
-				ToolHelper.addModifierToTool(ret, cs.material);
+			CraftingStack headMat = getCStack(head, pickHeadMaterials), handleMat = getCStack(handle, handleMaterials);
+			if(headMat != null && handleMat != null) {
+				ToolHelper.setToolMaterial(ret, headMat.material, handleMat.material);
+				ToolHelper.addModifierToTool(ret, headMat.material);
+				ToolHelper.addModifierToTool(ret, handleMat.material);
 			} else {
-				System.out.println("head cstack null");
-			}
-			
-			cs = getCStack(handle, handleMaterials);
-			if(cs != null) {
-				ToolHelper.addModifierToTool(ret, cs.material);
-			} else {
-				System.out.println("handle cstack null");
+				System.out.println("one of the materials is null");
+				return null;
 			}
 			
 			return ret;
@@ -610,7 +605,7 @@ public class RecipesTools { // Tinker's Tools - Okkapel683 edition ;)
 				return false;
 			}
 			
-			McoToolMaterial mat = ToolHelper.getRepairMaterial(tool);
+			McoToolMaterial mat = ToolHelper.getHeadMaterial(tool);
 			if(mat == null) {
 				return false;
 			}
@@ -634,7 +629,7 @@ public class RecipesTools { // Tinker's Tools - Okkapel683 edition ;)
 		@Override
 		public ItemStack getCraftingResult(InventoryCrafting cinv) {
 			ItemStack tool = this.tool.copy();
-			McoToolMaterial mat = ToolHelper.getRepairMaterial(tool);
+			McoToolMaterial mat = ToolHelper.getHeadMaterial(tool);
 			
 			boolean cutLoop = false;
 			int toRepair = ToolHelper.getDamage(tool);
