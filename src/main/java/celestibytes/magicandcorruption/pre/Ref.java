@@ -17,6 +17,7 @@ public class Ref {
 	public static class ItemNames {
 		public static final String ITEM_CRAFTING_GUIDE = "crafting_guide";
 		public static final String ITEM_PICKAXE = "mco_pickaxe";
+		public static final String ITEM_COFFEE = "coffee";
 	}
 	
 	public static enum Guis {

@@ -1,6 +1,9 @@
 # Blocks
 tile.magic_and_corruption_pre:mco_crafting_table.name=Crafting Table
 
+# Items
+item.magic_and_corruption_pre:coffee.name=Dank Coffee
+
 # Misc
 itemGroup.magic_and_corruption_pre=Magic and Corruption
 

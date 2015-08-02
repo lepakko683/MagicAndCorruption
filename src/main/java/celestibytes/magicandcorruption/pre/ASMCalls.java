@@ -1,5 +1,14 @@
 package celestibytes.magicandcorruption.pre;
 
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
+
+import celestibytes.magicandcorruption.asm.MagicAndCorruption_ASM;
+import celestibytes.magicandcorruption.pre.util.IAsmHooks;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -10,6 +19,75 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
 
 public class ASMCalls {
+	
+	public static final ASMClassLoader loader = new ASMClassLoader();
+	private static IAsmHooks asmHooks = null;
+	
+	/** May return null */
+	public static IAsmHooks getAsmHooks() {
+		if(asmHooks != null) {
+			return asmHooks;
+		}
+		
+		boolean obfuscated = MagicAndCorruption_ASM.isObfuscatedEnv(); // TODO: ?
+		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+		
+		MethodVisitor mv;
+		cw.visit(Opcodes.V1_6, Opcodes.ACC_PUBLIC | Opcodes.ACC_SUPER, "celestibytes/magicandcorruption/pre/AsmHook", null, "java/lang/Object", new String[] {Type.getInternalName(IAsmHooks.class)});
+		cw.visitSource(null, null); // TODO: code!
+		cw.visitField(Opcodes.ACC_PUBLIC, "instance", "Ljava/lang/Object;", null, null);
+		
+		mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "(Ljava/lang/Object;)V", null, null);
+		mv.visitCode();
+		mv.visitVarInsn(Opcodes.ALOAD, 0);
+		mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
+		mv.visitInsn(Opcodes.RETURN);
+		mv.visitMaxs(0, 0);
+		mv.visitEnd();
+		
+		mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "resizePotionArray", "(I)V", null, null);
+		mv.visitCode(); // 2 = old array, 3 = new array
+		mv.visitFieldInsn(Opcodes.GETSTATIC, obfuscated ? "rv" : "net/minecraft/potion/Potion", obfuscated ? "a" : "potionTypes", "[L" + (obfuscated ? "rv" : "net/minecraft/potion/Potion") + ";");
+		mv.visitInsn(Opcodes.DUP);
+		mv.visitInsn(Opcodes.ARRAYLENGTH);
+		mv.visitVarInsn(Opcodes.ISTORE, 5);
+		mv.visitVarInsn(Opcodes.ASTORE, 2);
+		mv.visitVarInsn(Opcodes.ILOAD, 1);
+		mv.visitTypeInsn(Opcodes.ANEWARRAY, obfuscated ? "rv" : "net/minecraft/potion/Potion");
+		mv.visitVarInsn(Opcodes.ASTORE, 3);
+		mv.visitInsn(Opcodes.ICONST_0);
+		mv.visitVarInsn(Opcodes.ISTORE, 4);
+		Label loop = new Label();
+		mv.visitLabel(loop);
+		mv.visitVarInsn(Opcodes.ALOAD, 3); // tgt array
+		mv.visitVarInsn(Opcodes.ILOAD, 4); // tgt index
+		mv.visitVarInsn(Opcodes.ALOAD, 2); // src array
+		mv.visitVarInsn(Opcodes.ILOAD, 4); // src index
+		mv.visitInsn(Opcodes.AALOAD);  // get tgt value
+		mv.visitInsn(Opcodes.AASTORE);
+		mv.visitIincInsn(4, 1);
+		mv.visitVarInsn(Opcodes.ILOAD, 4);
+		mv.visitVarInsn(Opcodes.ILOAD, 5);
+		mv.visitJumpInsn(Opcodes.IF_ICMPLT, loop);
+		mv.visitVarInsn(Opcodes.ALOAD, 3);
+		mv.visitFieldInsn(Opcodes.PUTSTATIC, obfuscated ? "rv" : "net/minecraft/potion/Potion", obfuscated ? "a" : "potionTypes", "[L" + (obfuscated ? "rv" : "net/minecraft/potion/Potion") + ";");
+		mv.visitInsn(Opcodes.RETURN);
+		mv.visitMaxs(0, 0);
+		mv.visitEnd();
+		mv = null;
+		cw.visitEnd();
+		
+		byte[] classBytes = cw.toByteArray();
+		
+		Class<?> asmHooksClass = loader.define("celestibytes/magicandcorruption/pre/AsmHook", classBytes);
+		try {
+			asmHooks = (IAsmHooks) asmHooksClass.newInstance();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return asmHooks;
+	}
 	
 	public static String getCountStringForStack(ItemStack stack) {
 		if(stack.stackSize == 666) {
@@ -122,5 +200,17 @@ public class ASMCalls {
 		default:
 			System.out.println("unknown code: " + id);
 		}
+	}
+	
+	private static class ASMClassLoader extends ClassLoader {
+		
+		public ASMClassLoader() {
+			super(ASMClassLoader.class.getClassLoader());
+		}
+		
+		public Class<?> define(String name, byte[] classBytes) {
+			return defineClass(name, classBytes, 0, classBytes.length);
+		}
+		
 	}
 }

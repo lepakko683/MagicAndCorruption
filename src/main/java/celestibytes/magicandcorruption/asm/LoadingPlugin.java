@@ -21,7 +21,8 @@ public class LoadingPlugin implements IFMLLoadingPlugin {
 			"celestibytes.magicandcorruption.asm.cts.CT_Container",
 			"celestibytes.magicandcorruption.asm.cts.CT_TextureMap",
 			"celestibytes.magicandcorruption.asm.cts.CT_EntityPlayer",
-			"celestibytes.magicandcorruption.asm.cts.natura.CT_NContent"
+			"celestibytes.magicandcorruption.asm.cts.natura.CT_NContent",
+			"celestibytes.magicandcorruption.asm.cts.CT_Potion"
 		};
 	}
 
