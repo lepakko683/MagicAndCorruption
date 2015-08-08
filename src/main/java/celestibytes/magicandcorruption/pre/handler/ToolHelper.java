@@ -9,6 +9,7 @@ import celestibytes.magicandcorruption.pre.crafting.RecipesTools;
 import celestibytes.magicandcorruption.pre.crafting.RecipesTools.IToolMod;
 import celestibytes.magicandcorruption.pre.crafting.RecipesTools.McoToolMaterial;
 import celestibytes.magicandcorruption.pre.init.ModItems;
+import celestibytes.magicandcorruption.pre.item.IMcoTool;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -127,7 +128,7 @@ public class ToolHelper {
 	
 	private static void recalcToolAttributes(ItemStack tool) {
 		NBTTagCompound toolNBT = getNBT(tool);
-		if(tool.getItem() == ModItems.pickaxe) {
+		if(tool.getItem() instanceof IMcoTool) {
 			toolNBT.setInteger(ATTR_DURABILITY, calcDurability(tool));
 			toolNBT.setFloat(ATTR_SPEED, calcSpeed(tool));
 			toolNBT.setInteger(ATTR_ENCHANTABILITY, calcEnchantability(tool));

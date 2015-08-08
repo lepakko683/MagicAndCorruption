@@ -12,6 +12,8 @@ public class ToolInit {
 	public static void init() {
 		addHandles();
 		addPickHeads();
+		addAxeHeads();
+		addShovelHeads();
 	}
 	
 	private static void addHandles() {
@@ -72,6 +74,28 @@ public class ToolInit {
 				.setDurabFlat(32).setSpeedFlat(12f).setHarvestLevel(0).setEnchFlat(22).addRepairStack(new ItemStack(Items.gold_ingot), 0.25f));
 		
 		RecipesTools.registerAxeHeadMaterial(new ItemStack(Items.diamond), new McoSimpleMaterial("axe_head_diamond",
+				IToolMod.FLAG_MOD_DURAB_FLAT | IToolMod.FLAG_MOD_SPEED_FLAT | IToolMod.FLAG_MOD_ENCH_FLAT)
+				.setDurabFlat(1561).setSpeedFlat(8f).setHarvestLevel(3).setEnchFlat(10).addRepairStack(new ItemStack(Items.diamond), 0.25f));
+	}
+	
+	private static void addShovelHeads() {
+		RecipesTools.registerShovelHeadMaterial(new ItemStack(Blocks.planks), new McoSimpleMaterial("shovel_head_wood",
+				IToolMod.FLAG_MOD_DURAB_FLAT | IToolMod.FLAG_MOD_SPEED_FLAT | IToolMod.FLAG_MOD_ENCH_FLAT)
+				.setDurabFlat(59).setSpeedFlat(2f).setHarvestLevel(0).setEnchFlat(15).addRepairStack(new ItemStack(Blocks.planks), 0.25f));
+		
+		RecipesTools.registerShovelHeadMaterial(new ItemStack(Items.flint), new McoSimpleMaterial("shovel_head_stone",
+				IToolMod.FLAG_MOD_DURAB_FLAT | IToolMod.FLAG_MOD_SPEED_FLAT | IToolMod.FLAG_MOD_ENCH_FLAT)
+				.setDurabFlat(131).setSpeedFlat(4f).setHarvestLevel(1).setEnchFlat(5).addRepairStack(new ItemStack(Items.flint), 0.25f));
+		
+		RecipesTools.registerShovelHeadMaterial(new ItemStack(Items.iron_ingot), new McoSimpleMaterial("shovel_head_iron",
+				IToolMod.FLAG_MOD_DURAB_FLAT | IToolMod.FLAG_MOD_SPEED_FLAT | IToolMod.FLAG_MOD_ENCH_FLAT)
+				.setDurabFlat(250).setSpeedFlat(6f).setHarvestLevel(2).setEnchFlat(14).addRepairStack(new ItemStack(Items.iron_ingot), 0.25f));
+		
+		RecipesTools.registerShovelHeadMaterial(new ItemStack(Items.gold_ingot), new McoSimpleMaterial("shovel_head_gold",
+				IToolMod.FLAG_MOD_DURAB_FLAT | IToolMod.FLAG_MOD_SPEED_FLAT | IToolMod.FLAG_MOD_ENCH_FLAT)
+				.setDurabFlat(32).setSpeedFlat(12f).setHarvestLevel(0).setEnchFlat(22).addRepairStack(new ItemStack(Items.gold_ingot), 0.25f));
+		
+		RecipesTools.registerShovelHeadMaterial(new ItemStack(Items.diamond), new McoSimpleMaterial("shovel_head_diamond",
 				IToolMod.FLAG_MOD_DURAB_FLAT | IToolMod.FLAG_MOD_SPEED_FLAT | IToolMod.FLAG_MOD_ENCH_FLAT)
 				.setDurabFlat(1561).setSpeedFlat(8f).setHarvestLevel(3).setEnchFlat(10).addRepairStack(new ItemStack(Items.diamond), 0.25f));
 	}

@@ -2,9 +2,15 @@
 tile.magic_and_corruption_pre:mco_crafting_table.name=Crafting Table
 
 # Items
+item.magic_and_corruption_pre:mco_pickaxe.name=Pickaxe
+item.magic_and_corruption_pre:mco_sword.name=Sword
+item.magic_and_corruption_pre:mco_axe.name=Axe
+item.magic_and_corruption_pre:mco_shovel.name=Shovel
+item.magic_and_corruption_pre:mco_hoe.name=Hoe
+item.magic_and_corruption_pre:mco_scythe.name=Scythe
+
 item.magic_and_corruption_pre:coffee.name=Coffee
 item.magic_and_corruption_pre:dankCoffee.name=Dank Coffee
-item.magic_and_corruption_pre:mco_pickaxe.name=Pickaxe
 item.magic_and_corruption_pre:boundSpell.name=Bound Spell
 
 # Misc

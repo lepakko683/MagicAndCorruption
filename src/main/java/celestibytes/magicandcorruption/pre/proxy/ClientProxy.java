@@ -31,6 +31,8 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void registerRendering() {
 		MinecraftForgeClient.registerItemRenderer(ModItems.pickaxe, rt);
+		MinecraftForgeClient.registerItemRenderer(ModItems.axe, rt);
+		MinecraftForgeClient.registerItemRenderer(ModItems.shovel, rt);
 		RenderingRegistry.registerBlockHandler(new RenderCompost());
 	}
 	

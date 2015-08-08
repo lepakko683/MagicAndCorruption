@@ -7,9 +7,11 @@ import org.lwjgl.opengl.GL12;
 
 import celestibytes.magicandcorruption.pre.crafting.RecipesTools.McoToolMaterial;
 import celestibytes.magicandcorruption.pre.handler.ToolHelper;
+import celestibytes.magicandcorruption.pre.init.ModItems;
 import celestibytes.magicandcorruption.pre.item.IMcoTool;
 import celestibytes.magicandcorruption.pre.item.ItemMcoPickaxe;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.client.IItemRenderer;

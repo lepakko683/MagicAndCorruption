@@ -20,7 +20,12 @@ public class Ref {
 	
 	public static class ItemNames {
 		public static final String ITEM_CRAFTING_GUIDE = "crafting_guide";
+		public static final String ITEM_SWORD = "mco_sword";
 		public static final String ITEM_PICKAXE = "mco_pickaxe";
+		public static final String ITEM_AXE = "mco_axe";
+		public static final String ITEM_SHOVEL = "mco_shovel";
+		public static final String ITEM_HOE = "mco_hoe";
+		public static final String ITEM_SCYTHE = "mco_scythe";
 		public static final String ITEM_COFFEE = "coffee";
 		public static final String BOUND_SPELL = "bound_spell";
 	}
