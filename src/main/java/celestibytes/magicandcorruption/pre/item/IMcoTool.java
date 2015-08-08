@@ -1,6 +1,7 @@
 package celestibytes.magicandcorruption.pre.item;
 
 import java.util.List;
+import java.util.Map;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -10,6 +11,6 @@ import net.minecraft.util.IIcon;
 public interface IMcoTool {
 	
 	@SideOnly(Side.CLIENT)
-	public List<IIcon> getHeadIcons(ItemStack tool);
+	public Map<String, IIcon> getHeadIconsMap(ItemStack tool);
 	
 }

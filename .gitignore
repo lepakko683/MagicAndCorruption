@@ -9,6 +9,7 @@ modUnpack/
 .project
 .settings/
 .gradle/
+.directory
 eclipse/
 MinecraftForge-README.txt
 Modding-README.txt
@@ -24,4 +25,4 @@ findObfName
 # Misc
 obfuscation_notes
 src/main/java/celestibytes/magicandcorruption/asm/cts/CT_InventoryBasic.java
-
+src/main/resources/META-INF/ThaumicTinkerer_at.cfg

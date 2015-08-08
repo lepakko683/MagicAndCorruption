@@ -1,14 +1,7 @@
 package celestibytes.magicandcorruption.asm.cts;
 
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.Iterator;
 
-import net.minecraft.item.ItemStack;
-
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
@@ -26,11 +19,7 @@ import celestibytes.magicandcorruption.asm.ClassTransformer;
 public class CT_ItemStack extends ClassTransformer {
 
 	public CT_ItemStack() {
-		super("net.minecraft.item.ItemStack");
-		String[] dd = new String[4];
-		int a = dd.length;
-		String b = dd[2];
-		dd[1] = "woot";
+		super("net.minecraft.item.ItemStack", "ItemStack");
 	}
 
 	@Override
@@ -38,10 +27,7 @@ public class CT_ItemStack extends ClassTransformer {
 		int classModified = 0;
 		MethodNode mtd;
 		
-		ClassReader cr = new ClassReader(classBytes);
-		
-		ClassNode cn = new ClassNode();
-		cr.accept(cn, 0);
+		ClassNode cn = getClassNode(classBytes);
 		
 		mtd = findMethod(obfuscated ? "a" : "useItemRightClick", obfuscated ? "(Lahb;Lyz;)Ladd;" : "(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraft/item/ItemStack;", cn);
 		if(mtd != null) { // run when no block was hovered over! we still want to be able to place blocks against furnaces and chests by sneaking
@@ -120,32 +106,18 @@ public class CT_ItemStack extends ClassTransformer {
 		}
 		
 		if(classModified == 3) {
-			ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-			cn.accept(cw);
-			
-			byte[] ret = cw.toByteArray();
-//			try {
-//				File out = new File("/home/okkapel/Programming/Minecraft/MagicAndCorruption/itemstack.class");
-//				DataOutputStream dos = new DataOutputStream(new FileOutputStream(out));
-//				dos.write(ret);
-//				dos.close();
-//			} catch(Exception e) {
-//				e.printStackTrace();
-//			}
-			
-			System.out.println("[Magic and Corruption - CT: ItemStack] success");
-			return ret;
+			return getNewBytesLog(cn);
 		} else {
 			if(classModified == 1) {
-				System.out.println("[Magic and Corruption - CT: ItemStack] failed, writeToNBT changed but not readFromNBT, this is bad!");				
+				printStatus("failed, writeToNBT changed but not readFromNBT");
 			} else if(classModified == 2) {
-				System.out.println("[Magic and Corruption - CT: ItemStack] failed, readFromNBT changed but not writeToNBT, this is bad!");
+				printStatus("failed, readFromNBT changed but not writeToNBT");
 			} else {
-				System.out.println("[Magic and Corruption - CT: ItemStack] failed, no changes done, this is bad!");
+				printStatus("failed, no changes done");
 			}
 		}
 		
-		return classBytes;
+		return returnFail(classBytes);
 	}
 
 

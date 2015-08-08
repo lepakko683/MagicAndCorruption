@@ -1,5 +1,7 @@
 package celestibytes.magicandcorruption.pre;
 
+import java.util.HashMap;
+
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
@@ -8,6 +10,8 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
 import celestibytes.magicandcorruption.asm.MagicAndCorruption_ASM;
+import celestibytes.magicandcorruption.pre.init.Potions;
+import celestibytes.magicandcorruption.pre.item.ItemBoundSpell;
 import celestibytes.magicandcorruption.pre.util.IAsmHooks;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -15,11 +19,13 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
 
 public class ASMCalls {
-	
+	// celestibytes/magicandcorruption/pre/ASMCalls
 	public static final ASMClassLoader loader = new ASMClassLoader();
 	private static IAsmHooks asmHooks = null;
 	
@@ -86,7 +92,16 @@ public class ASMCalls {
 			e.printStackTrace();
 		}
 		
+		System.out.println("Hook Class created!");
 		return asmHooks;
+	}
+	
+	public static boolean hasCauldronProtection(ItemStack item) {
+		if(item.stackTagCompound == null) {
+			return false;
+		}
+		
+		return item.stackTagCompound.getBoolean(ItemBoundSpell.CAULDRON_PROTECTION);
 	}
 	
 	public static String getCountStringForStack(ItemStack stack) {
@@ -128,8 +143,35 @@ public class ASMCalls {
 		return false;
 	}
 	
+	@SuppressWarnings("rawtypes")
+	public static boolean isPotionActive(Potion potion, HashMap potionMap) {
+		if(potion.id == Potion.digSpeed.id && potionMap.containsKey(Integer.valueOf(Potions.potionCoffee.id))) {
+			return true;
+		}
+		
+		return potionMap.containsKey(Integer.valueOf(Potions.potionCoffee.id));
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public static boolean isPotionActive(int id, HashMap potionMap) {
+		return false;
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public static PotionEffect getActivePotionEffect(Potion potion, HashMap activePotions) {
+		if(potion.id == Potion.digSpeed.id) {
+			PotionEffect ret = (PotionEffect) activePotions.get(Integer.valueOf(Potions.potionCoffee.id));
+			
+			if(ret != null) {
+				return ret;
+			}
+		}
+		
+		return (PotionEffect) activePotions.get(Integer.valueOf(potion.id));
+	}
+	
 	public static void handleCycleExtraItems(ItemStack[] stacks, World world, EntityPlayer plr) {
-		System.out.println("Call!");
+//		System.out.println("Call!");
 		if(stacks.length > 1) {
 			for(int i = 1; i < stacks.length; i++) {
 				if(stacks[i] != null) {

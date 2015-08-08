@@ -24,7 +24,7 @@ import celestibytes.magicandcorruption.asm.ClassTransformer;
 public class CT_EntityPlayer extends ClassTransformer {
 
 	public CT_EntityPlayer() {
-		super("net.minecraft.entity.player.EntityPlayer");
+		super("net.minecraft.entity.player.EntityPlayer", "EntityPlayer");
 	}
 
 	@Override
@@ -56,17 +56,35 @@ public class CT_EntityPlayer extends ClassTransformer {
 		mtd.instructions.add(ij);
 		cn.methods.add(mtd);
 		
-		byte[] ret = getNewBytes(cn);
-		System.out.println("[Magic and Corruption - CT: EntityPlayer] success");
-//		try {
-//			File out = new File("/home/okkapel/Programming/Minecraft/MagicAndCorruption/entityplayer.class");
-//			DataOutputStream dos = new DataOutputStream(new FileOutputStream(out));
-//			dos.write(ret);
-//			dos.close();
-//		} catch(Exception e) {
-//			e.printStackTrace();
-//		}
-		return ret;
+		mtd = findMethod("getBreakSpeed", obfuscated ? "(Laji;ZIIII)F" : "(Lnet/minecraft/block/Block;ZIIII)F", cn);
+		if(mtd != null) {
+			Iterator<AbstractInsnNode> iter = mtd.instructions.iterator();
+			while (iter.hasNext()) {
+				AbstractInsnNode insn = iter.next();
+				if(insn.getOpcode() == INVOKEVIRTUAL) {
+					MethodInsnNode min = (MethodInsnNode) insn;
+					if(min.owner.equals(obfuscated ? "yz" : "net/minecraft/entity/player/EntityPlayer") && min.name.equals(obfuscated ? "a" : "isPotionActive") && min.desc.equals(obfuscated ? "(Lrv;)Z" : "(Lnet/minecraft/potion/Potion;)Z")) {
+						AbstractInsnNode getPotion = min.getPrevious();
+						if(getPotion != null && getPotion.getOpcode() == GETSTATIC) {
+							FieldInsnNode fin = (FieldInsnNode) getPotion;
+							if(fin.name.equals(obfuscated ? "e" : "digSpeed")) {
+								InsnList inj = new InsnList();
+								inj.add(new VarInsnNode(ALOAD, 0));
+								inj.add(new FieldInsnNode(GETFIELD, obfuscated ? "yz" : "net/minecraft/entity/player/EntityPlayer", obfuscated ? "f" : "activePotionsMap", "Ljava/util/HashMap;"));
+								inj.add(new MethodInsnNode(INVOKESTATIC, "celestibytes/magicandcorruption/pre/ASMCalls", "isPotionActive", obfuscated ? "(Lrv;Ljava/util/HashMap;)Z" : "(Lnet/minecraft/potion/Potion;Ljava/util/HashMap;)Z", false));
+								
+								mtd.instructions.insert(min, inj);
+								mtd.instructions.remove(min);
+								
+								return getNewBytesLog(cn);
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		return returnFail(classBytes);
 	}
 
 }

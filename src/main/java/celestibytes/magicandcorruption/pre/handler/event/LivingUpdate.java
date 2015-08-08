@@ -1,4 +1,4 @@
-package celestibytes.magicandcorruption.pre.handler;
+package celestibytes.magicandcorruption.pre.handler.event;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.registry.GameData;

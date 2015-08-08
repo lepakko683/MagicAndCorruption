@@ -2,8 +2,6 @@ package celestibytes.magicandcorruption.asm.cts;
 
 import java.util.Iterator;
 
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
@@ -16,14 +14,12 @@ import celestibytes.magicandcorruption.asm.ClassTransformer;
 public class CT_RenderItem extends ClassTransformer {
 
 	public CT_RenderItem() {
-		super("net.minecraft.client.renderer.entity.RenderItem");
+		super("net.minecraft.client.renderer.entity.RenderItem", "RenderItem");
 	}
 
 	@Override
 	public byte[] transform(String name, String transformedName, byte[] classBytes, boolean obfuscated) {
-		ClassReader cr = new ClassReader(classBytes);
-		ClassNode cn = new ClassNode();
-		cr.accept(cn, 0);
+		ClassNode cn = getClassNode(classBytes);
 		
 		MethodNode mtd = findMethod(obfuscated ? "a" : "renderItemOverlayIntoGUI", obfuscated ? "(Lbbu;Lbqf;Ladd;IILjava/lang/String;)V" : "(Lnet/minecraft/client/gui/FontRenderer;Lnet/minecraft/client/renderer/texture/TextureManager;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V", cn.methods);
 		if(mtd != null) {
@@ -41,11 +37,7 @@ public class CT_RenderItem extends ClassTransformer {
 								mtd.instructions.remove(min);
 								mtd.instructions.remove(fin);
 								
-								ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-								cn.accept(cw);
-								
-								System.out.println("[Magic and Corruption - CT: RenderItem] success");
-								return cw.toByteArray();
+								return getNewBytesLog(cn);
 							}
 						}
 					}
@@ -53,8 +45,7 @@ public class CT_RenderItem extends ClassTransformer {
 			}
 		}
 		
-		System.out.println("[Magic and Corruption - CT: RenderItem] fail");
-		return classBytes;
+		return returnFail(classBytes);
 	}
 
 }

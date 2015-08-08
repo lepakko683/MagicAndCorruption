@@ -67,7 +67,7 @@ jar
         manifest
         {
                 attributes("FMLCorePlugin": "celestibytes.magicandcorruption.asm.LoadingPlugin",
-"FMLCorePluginContainsFMLMod": "true")
+"FMLCorePluginContainsFMLMod": "true", "FMLAT": "magic_and_corruption_pre_at.cfg")
         }
 }
 

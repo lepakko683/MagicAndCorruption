@@ -52,7 +52,15 @@ public class PackItems {
 	}
 	
 	public static class Witchery {
+		private static Item getItem(String name) {
+			return GameData.getItemRegistry().getObject("witchery:" + name);
+		}
 		
+		/** Metadata: <pre>
+		 * 63: Rowan Berries
+		 * </pre>
+		 */
+		public static Item itemIngredient = getItem("ingredient");
 	}
 	
 	public static class Natura {

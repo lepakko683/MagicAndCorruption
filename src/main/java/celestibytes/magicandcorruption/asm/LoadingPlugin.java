@@ -22,7 +22,10 @@ public class LoadingPlugin implements IFMLLoadingPlugin {
 			"celestibytes.magicandcorruption.asm.cts.CT_TextureMap",
 			"celestibytes.magicandcorruption.asm.cts.CT_EntityPlayer",
 			"celestibytes.magicandcorruption.asm.cts.natura.CT_NContent",
-			"celestibytes.magicandcorruption.asm.cts.CT_Potion"
+			"celestibytes.magicandcorruption.asm.cts.CT_Potion",
+			"celestibytes.magicandcorruption.asm.cts.CT_EntityLivingBase",
+			"celestibytes.magicandcorruption.asm.cts.CT_ModRemapper",
+			"celestibytes.magicandcorruption.asm.cts.thaumcraft.CT_BlockMetalDevice"
 		};
 	}
 

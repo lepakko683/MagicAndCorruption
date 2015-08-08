@@ -76,9 +76,8 @@ public class ToolHelper {
 		NBTTagCompound nbt = getModsNBT(tool);
 		if(!nbt.hasKey(mod.getModId())) {
 			nbt.setTag(mod.getModId(), new NBTTagCompound());
+			recalcToolAttributes(tool);
 		}
-		
-		recalcToolAttributes(tool);
 	}
 	
 	/** Used when determining the correct repair material. */
@@ -86,6 +85,8 @@ public class ToolHelper {
 		NBTTagCompound nbt = getNBT(tool);
 		nbt.setString(TOOL_MATERIAL_HEAD, head.modId);
 		nbt.setString(TOOL_MATERIAL_HANDLE, handle.modId);
+		addModifierToTool(tool, head);
+		addModifierToTool(tool, handle);
 	}
 	
 	public static McoToolMaterial getHeadMaterial(ItemStack tool) {

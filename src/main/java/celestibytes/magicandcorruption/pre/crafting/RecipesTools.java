@@ -8,6 +8,7 @@ import java.util.Map;
 
 import celestibytes.magicandcorruption.pre.handler.ToolHelper;
 import celestibytes.magicandcorruption.pre.init.ModItems;
+import celestibytes.magicandcorruption.pre.init.ToolInit;
 import celestibytes.magicandcorruption.pre.item.IMcoTool;
 import celestibytes.magicandcorruption.pre.util.BlockPos;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -20,19 +21,89 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
+import net.minecraftforge.oredict.RecipeSorter;
 
 public class RecipesTools { // Tinker's Tools - Okkapel683 edition ;)
 	
 	private static Map<String, IToolMod> modLookup = new HashMap<String, IToolMod>();
 	
 	private static List<CraftingStack> handleMaterials = new LinkedList<CraftingStack>();
-	private static List<CraftingStack> pickHeadMaterials = new LinkedList<CraftingStack>();
 	
-//	private static List<CraftingStack> axeHeadMaterials;
-//	private static List<CraftingStack> swordHeadMaterials;
-//	private static List<CraftingStack> hoeHeadMaterials;
-//	private static List<CraftingStack> shovelHeadMaterials;
-//	private static List<CraftingStack> sickleHeadMaterials;
+	private static List<CraftingStack> swordHeadMaterials = new LinkedList<CraftingStack>();
+	private static List<CraftingStack> pickHeadMaterials = new LinkedList<CraftingStack>();
+	private static List<CraftingStack> axeHeadMaterials = new LinkedList<CraftingStack>();
+	private static List<CraftingStack> hoeHeadMaterials = new LinkedList<CraftingStack>();
+	private static List<CraftingStack> shovelHeadMaterials = new LinkedList<CraftingStack>();
+	private static List<CraftingStack> scytheHeadMaterials = new LinkedList<CraftingStack>();
+	
+	public static List<CraftingStack> getHandleMaterials() {
+		return handleMaterials;
+	}
+	
+	public static List<CraftingStack> getSwordHeadMaterials() {
+		return swordHeadMaterials;
+	}
+	
+	public static List<CraftingStack> getPickHeadMaterials() {
+		return pickHeadMaterials;
+	}
+	
+	public static List<CraftingStack> getAxeHeadMaterials() {
+		return axeHeadMaterials;
+	}
+	
+	public static List<CraftingStack> getHoeHeadMaterials() {
+		return hoeHeadMaterials;
+	}
+	
+	public static List<CraftingStack> getShovelHeadMaterials() {
+		return shovelHeadMaterials;
+	}
+	
+	public static List<CraftingStack> getScytheHeadMaterials() {
+		return scytheHeadMaterials;
+	}
+	
+	private static boolean registerToolMaterial(List<CraftingStack> list, ItemStack mat, McoToolMaterial data) {
+		if(!listContains(list, mat)) {
+			list.add(new CraftingStack(mat, data));
+			if(!modLookup.containsKey(data.modId)) {
+				modLookup.put(data.modId, data);
+			}
+			
+			return true;
+		}
+		
+		return false;
+	}
+	
+	public static boolean registerHandleMaterial(ItemStack mat, McoToolMaterial data) {
+		return registerToolMaterial(handleMaterials, mat, data);
+	}
+	
+	public static boolean registerSwordHeadMaterial(ItemStack mat, McoToolMaterial data) {
+		return registerToolMaterial(swordHeadMaterials, mat, data);
+	}
+	
+	public static boolean registerPickHeadMaterial(ItemStack mat, McoToolMaterial data) {
+		return registerToolMaterial(pickHeadMaterials, mat, data);
+	}
+	
+	public static boolean registerAxeHeadMaterial(ItemStack mat, McoToolMaterial data) {
+		return registerToolMaterial(axeHeadMaterials, mat, data);
+	}
+	
+	public static boolean registerHoeHeadMaterial(ItemStack mat, McoToolMaterial data) {
+		return registerToolMaterial(hoeHeadMaterials, mat, data);
+	}
+	
+	public static boolean registerShovelHeadMaterial(ItemStack mat, McoToolMaterial data) {
+		return registerToolMaterial(shovelHeadMaterials, mat, data);
+	}
+	
+	public static boolean registerScytheHeadMaterial(ItemStack mat, McoToolMaterial data) {
+		return registerToolMaterial(scytheHeadMaterials, mat, data);
+	}
 	
 	public static class CraftingStack {
 		public final ItemStack stack;
@@ -337,30 +408,13 @@ public class RecipesTools { // Tinker's Tools - Okkapel683 edition ;)
 		return modLookup.get(id);
 	}
 	
-	public static boolean registerPickHeadMaterial(ItemStack mat, McoToolMaterial data) {
-		if(!pickHeadMaterials.contains(mat)) {
-			pickHeadMaterials.add(new CraftingStack(mat, data));
-			if(!modLookup.containsKey(data.modId)) {
-				modLookup.put(data.modId, data);
-			}
-			
-			return true;
+	public static McoToolMaterial getMaterial(String id) {
+		IToolMod mod = modLookup.get(id);
+		if(mod instanceof McoToolMaterial) {
+			return (McoToolMaterial) mod;
 		}
 		
-		return false;
-	}
-	
-	public static boolean registerHandleMaterial(ItemStack mat, McoToolMaterial data) {
-		if(!handleMaterials.contains(mat)) {
-			handleMaterials.add(new CraftingStack(mat, data));
-			if(!modLookup.containsKey(data.modId)) {
-				modLookup.put(data.modId, data);
-			}
-			
-			return true;
-		}
-		
-		return false;
+		return null;
 	}
 	
 	public static boolean isHeadMaterial(ItemStack stack) {
@@ -372,16 +426,16 @@ public class RecipesTools { // Tinker's Tools - Okkapel683 edition ;)
 	}
 	
 	public static void init() {
-		registerHandleMaterial(new ItemStack(Items.stick), new McoSimpleMaterial("handle_wood", IToolMod.FLAG_MOD_DURAB_MULT | IToolMod.FLAG_MOD_SPEED_MULT).setDurabMult(1.2f).setSpeedMult(0.8f));
-		registerHandleMaterial(new ItemStack(Items.reeds), new McoSimpleMaterial("handle_reed", IToolMod.FLAG_MOD_DURAB_MULT | IToolMod.FLAG_MOD_SPEED_MULT).setDurabMult(1f).setSpeedMult(1f));
+		ToolInit.init();
 		
-		registerPickHeadMaterial(new ItemStack(Items.flint), new McoSimpleMaterial("head_stone", IToolMod.FLAG_MOD_DURAB_FLAT | IToolMod.FLAG_MOD_SPEED_FLAT).setDurabFlat(64).setSpeedFlat(1f).addRepairStack(new ItemStack(Items.flint), 0.25f));
-		registerPickHeadMaterial(new ItemStack(Items.iron_ingot), new McoSimpleMaterial("head_iron", IToolMod.FLAG_MOD_DURAB_FLAT | IToolMod.FLAG_MOD_SPEED_FLAT).setDurabFlat(128).setSpeedFlat(2f).addRepairStack(new ItemStack(Items.iron_ingot), 0.25f));
 		
 		RecipePickaxe rpick = new RecipePickaxe(new ItemStack(ModItems.pickaxe));
 		if(rpick.valid) {
+			RecipeSorter.register("mco_recipe_pickaxe", rpick.getClass(), RecipeSorter.Category.SHAPED, "");
 			GameRegistry.addRecipe(rpick);
 		}
+		
+		RecipeSorter.register("mco_recipes_repair", RecipesRepair.class, RecipeSorter.Category.SHAPED, "");
 		GameRegistry.addRecipe(new RecipesRepair());
 	}
 	
@@ -563,8 +617,8 @@ public class RecipesTools { // Tinker's Tools - Okkapel683 edition ;)
 			CraftingStack headMat = getCStack(head, pickHeadMaterials), handleMat = getCStack(handle, handleMaterials);
 			if(headMat != null && handleMat != null) {
 				ToolHelper.setToolMaterial(ret, headMat.material, handleMat.material);
-				ToolHelper.addModifierToTool(ret, headMat.material);
-				ToolHelper.addModifierToTool(ret, handleMat.material);
+//				ToolHelper.addModifierToTool(ret, headMat.material);
+//				ToolHelper.addModifierToTool(ret, handleMat.material);
 			} else {
 				System.out.println("one of the materials is null");
 				return null;

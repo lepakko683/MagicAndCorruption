@@ -13,7 +13,7 @@ import celestibytes.magicandcorruption.asm.ClassTransformer;
 
 public class CT_Potion extends ClassTransformer {
 
-	public static final int DEFAULT_POTION_ARRAY_SIZE = 128;
+	public static final int DEFAULT_POTION_ARRAY_SIZE = 127; // bytes -.-
 	
 	public CT_Potion() {
 		super("net.minecraft.potion.Potion");
@@ -46,7 +46,7 @@ public class CT_Potion extends ClassTransformer {
 		
 		System.out.println("[Magic and Corruption - CT: Potion] fail");
 		
-		return classBytes;
+		return returnFail(classBytes);
 	}
 
 }
