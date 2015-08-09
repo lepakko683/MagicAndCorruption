@@ -75,7 +75,7 @@ public class ItemMcoPickaxe extends ItemPickaxe implements IMcoTool {
 		pickHeadIcons.put("pick_head_iron", ir.registerIcon(Ref.MOD_ID + ":pick_head_iron"));
 		pickHeadIcons.put("pick_head_gold", ir.registerIcon(Ref.MOD_ID + ":pick_head_gold"));
 		pickHeadIcons.put("pick_head_diamond", ir.registerIcon(Ref.MOD_ID + ":pick_head_diamond"));
-		super.registerIcons(ir);
+//		super.registerIcons(ir);
 	}
 	
 	@Override
@@ -153,17 +153,22 @@ public class ItemMcoPickaxe extends ItemPickaxe implements IMcoTool {
 	}
 	
 	@Override
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public Multimap getItemAttributeModifiers() {
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public Multimap getAttributeModifiers(ItemStack stack) {
 		Multimap map = super.getItemAttributeModifiers();
 		map.clear();
-		map.put(SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(), new AttributeModifier(field_111210_e, "Tool Modifier", 0d, 0));
+		map.put(SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(), new AttributeModifier(field_111210_e, "Tool modifier", 2f + ToolHelper.getAttackDamage(stack), 0));
 		return map;
 	}
 
 	@Override
 	public Map<String, IIcon> getHeadIconsMap(ItemStack tool) {
 		return pickHeadIcons;
+	}
+	
+	@Override
+	public float getAttackDamage(ItemStack stack, EntityLivingBase target, EntityLivingBase source) {
+		return 1f;
 	}
 
 }

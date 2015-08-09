@@ -40,6 +40,12 @@ public class RecipesTools { // Tinker's Tools - Okkapel683 edition ;)
 	public static void init() {
 		ToolInit.init();
 		
+		RecipeSword rsword = new RecipeSword(new ItemStack(ModItems.sword));
+		if(rsword.valid) {
+			RecipeSorter.register("mco_recipe_sword", rsword.getClass(), RecipeSorter.Category.SHAPED, "");
+			GameRegistry.addRecipe(rsword);
+		}
+		
 		RecipePickaxe rpick = new RecipePickaxe(new ItemStack(ModItems.pickaxe));
 		if(rpick.valid) {
 			RecipeSorter.register("mco_recipe_pickaxe", rpick.getClass(), RecipeSorter.Category.SHAPED, "");
@@ -56,6 +62,12 @@ public class RecipesTools { // Tinker's Tools - Okkapel683 edition ;)
 		if(rshovel.valid) {
 			RecipeSorter.register("mco_recipe_shovel", rshovel.getClass(), RecipeSorter.Category.SHAPED, "");
 			GameRegistry.addRecipe(rshovel);
+		}
+		
+		RecipeHoe rhoe = new RecipeHoe(new ItemStack(ModItems.hoe));
+		if(rhoe.valid) {
+			RecipeSorter.register("mco_recipe_hoe", rhoe.getClass(), RecipeSorter.Category.SHAPED, "");
+			GameRegistry.addRecipe(rhoe);
 		}
 		
 		RecipeSorter.register("mco_recipes_repair", RecipesRepair.class, RecipeSorter.Category.SHAPELESS, "");
@@ -226,6 +238,9 @@ public class RecipesTools { // Tinker's Tools - Okkapel683 edition ;)
 		public int getEnchFlat(ItemStack stack);
 		public float getEnchMult(ItemStack stack);
 		
+		public float getAttackDmgFlat(ItemStack stack);
+		public float getAttackDmgMult(ItemStack stack);
+		
 		/** Modifier id, not actual modid. */
 		public String getModId();
 		
@@ -318,7 +333,7 @@ public class RecipesTools { // Tinker's Tools - Okkapel683 edition ;)
 		
 		private final List<RepairStack> repairStacks = new LinkedList<RepairStack>();
 		
-		private float enchMult = 1f, durabMult = 1f, speedMult = 1f, speedFlat = 1;
+		private float enchMult = 1f, durabMult = 1f, speedMult = 1f, speedFlat = 1f, attackDmgMult = 1f, attackDmgFlat = 0f;
 		private int enchFlat = 0, durabFlat = 0;
 		private int harvestLevel = 0;
 
@@ -358,6 +373,16 @@ public class RecipesTools { // Tinker's Tools - Okkapel683 edition ;)
 		
 		public McoSimpleMaterial setHarvestLevel(int val) {
 			this.harvestLevel = val;
+			return this;
+		}
+		
+		public McoSimpleMaterial setAttackDmgFlat(float val) {
+			this.attackDmgFlat = val;
+			return this;
+		}
+		
+		public McoSimpleMaterial setAttackDmgMult(float val) {
+			this.attackDmgMult = val;
 			return this;
 		}
 		
@@ -411,6 +436,14 @@ public class RecipesTools { // Tinker's Tools - Okkapel683 edition ;)
 			return harvestLevel;
 		}
 		
+		public float getAttackDmgFlat(ItemStack stack) {
+			return attackDmgFlat;
+		}
+		
+		public float getAttackDmgMult(ItemStack stack) {
+			return attackDmgMult;
+		}
+		
 		@Override
 		public int getRepairAmount(ItemStack tool, ItemStack repairStack) {
 			for(RepairStack rs : repairStacks) {
@@ -427,7 +460,7 @@ public class RecipesTools { // Tinker's Tools - Okkapel683 edition ;)
 		public boolean isPrimaryRepairMaterial(ItemStack repairStack) {
 			return repairStacks.size() >= 1 ? repairStacks.get(0).equals(repairStack) : false;
 		}
-		
+
 	}
 	
 	public static IToolMod getModifier(String id) {
@@ -749,6 +782,102 @@ public class RecipesTools { // Tinker's Tools - Okkapel683 edition ;)
 		public ItemStack getResult(ItemStack head, ItemStack handle) {
 			ItemStack ret = output.copy();
 			CraftingStack headMat = getCStack(head, shovelHeadMaterials), handleMat = getCStack(handle, handleMaterials);
+			if(headMat != null && handleMat != null) {
+				ToolHelper.setToolMaterial(ret, headMat.material, handleMat.material);
+			} else {
+				System.out.println("one of the materials is null");
+				return null;
+			}
+			
+			return ret;
+		}
+	}
+	
+	private static final class RecipeHoe extends RecipeTool {
+
+		protected RecipeHoe(ItemStack output) {
+			super(output, "##", " *", " *");
+		}
+		
+		@Override
+		public boolean areMaterialsValid(ItemStack head, ItemStack handle) {
+			return listContains(hoeHeadMaterials, head) && listContains(handleMaterials, handle);
+		}
+
+		@Override
+		public ItemStack getHeadStack(InventoryCrafting cinv) {
+			for(int i = 0; i < 3; i++) {
+				ItemStack is = cinv.getStackInSlot(i);
+				if(is != null) {
+					return is;
+				}
+			}
+			return null;
+		}
+
+		@Override
+		public ItemStack getHandleStack(InventoryCrafting cinv) {
+			for(int i = 3; i < 6; i++) {
+				ItemStack is = cinv.getStackInSlot(i);
+				if(is != null) {
+					return is;
+				}
+			}
+			return null;
+		}
+
+		@Override
+		public ItemStack getResult(ItemStack head, ItemStack handle) {
+			ItemStack ret = output.copy();
+			CraftingStack headMat = getCStack(head, hoeHeadMaterials), handleMat = getCStack(handle, handleMaterials);
+			if(headMat != null && handleMat != null) {
+				ToolHelper.setToolMaterial(ret, headMat.material, handleMat.material);
+			} else {
+				System.out.println("one of the materials is null");
+				return null;
+			}
+			
+			return ret;
+		}
+	}
+	
+	private static final class RecipeSword extends RecipeTool {
+
+		protected RecipeSword(ItemStack output) {
+			super(output, "#", "#", "*");
+		}
+		
+		@Override
+		public boolean areMaterialsValid(ItemStack head, ItemStack handle) {
+			return listContains(swordHeadMaterials, head) && listContains(handleMaterials, handle);
+		}
+
+		@Override
+		public ItemStack getHeadStack(InventoryCrafting cinv) {
+			for(int i = 0; i < 3; i++) {
+				ItemStack is = cinv.getStackInSlot(i);
+				if(is != null) {
+					return is;
+				}
+			}
+			return null;
+		}
+
+		@Override
+		public ItemStack getHandleStack(InventoryCrafting cinv) {
+			for(int i = 6; i < 9; i++) {
+				ItemStack is = cinv.getStackInSlot(i);
+				if(is != null) {
+					return is;
+				}
+			}
+			return null;
+		}
+
+		@Override
+		public ItemStack getResult(ItemStack head, ItemStack handle) {
+			ItemStack ret = output.copy();
+			CraftingStack headMat = getCStack(head, swordHeadMaterials), handleMat = getCStack(handle, handleMaterials);
 			if(headMat != null && handleMat != null) {
 				ToolHelper.setToolMaterial(ret, headMat.material, handleMat.material);
 			} else {

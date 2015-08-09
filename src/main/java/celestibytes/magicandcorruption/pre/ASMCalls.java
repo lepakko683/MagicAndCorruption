@@ -175,7 +175,7 @@ public class ASMCalls {
 		if(stacks.length > 1) {
 			for(int i = 1; i < stacks.length; i++) {
 				if(stacks[i] != null) {
-					System.out.println("extra stack size: " + stacks[i].stackSize + ", name: " + stacks[i].getDisplayName() + ", meta: " + stacks[i].getItemDamage());
+//					System.out.println("extra stack size: " + stacks[i].stackSize + ", name: " + stacks[i].getDisplayName() + ", meta: " + stacks[i].getItemDamage());
 				}
 				//if(!plr.inventory.addItemStackToInventory(stacks[i].copy())) {
 				if(!addExtraStack(stacks[i].copy(), plr)) {
@@ -225,7 +225,7 @@ public class ASMCalls {
 		return false;
 	}
 	
-	public static void debugOutput(int id) { // celestibytes/magicandcorruption/ASMCalls debugOutput (I)V false
+	public static void debugOutput(int id) { // celestibytes/magicandcorruption/pre/ASMCalls debugOutput (I)V false
 		switch(id) {
 		case 0:
 			System.out.println("nosend");
@@ -234,10 +234,10 @@ public class ASMCalls {
 			System.out.println("sendContainerAndContentsToPlayer");
 			break;
 		case 2:
-			System.out.println("stepassist on");
+//			System.out.println("stepassist on");
 			break;
 		case 3:
-			System.out.println("stepassist off");
+//			System.out.println("stepassist off");
 			break;
 		default:
 			System.out.println("unknown code: " + id);

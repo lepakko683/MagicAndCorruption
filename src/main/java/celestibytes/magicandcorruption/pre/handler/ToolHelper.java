@@ -134,6 +134,7 @@ public class ToolHelper {
 			toolNBT.setInteger(ATTR_ENCHANTABILITY, calcEnchantability(tool));
 			McoToolMaterial mat = getHeadMaterial(tool);
 			toolNBT.setInteger(ATTR_HARVEST_LVL, mat != null ? mat.getHarvestLevel() : 0);
+			toolNBT.setFloat(ATTR_DAMAGE, calcAttackDamage(tool));
 		}
 	}
 		
@@ -145,6 +146,22 @@ public class ToolHelper {
 		}
 		
 		return modNBT;
+	}
+	
+	public static float calcAttackDamage(ItemStack tool) {
+		List<IToolMod> flatmods = getModifiers(tool, IToolMod.FLAG_MOD_DMG_FLAT);
+		List<IToolMod> multmods = getModifiers(tool, IToolMod.FLAG_MOD_DMG_MULT);
+		
+		float ret = 0;
+		for(IToolMod m : flatmods) {
+			ret += m.getAttackDmgFlat(tool);
+		}
+		
+		for(IToolMod m : multmods) {
+			ret *= m.getAttackDmgMult(tool);
+		}
+		
+		return ret;
 	}
 	
 	public static int calcDurability(ItemStack tool) {
@@ -223,4 +240,7 @@ public class ToolHelper {
 		return getNBT(tool).getInteger(ATTR_HARVEST_LVL);
 	}
 	
+	public static float getAttackDamage(ItemStack tool) {
+		return getNBT(tool).getFloat(ATTR_DAMAGE);
+	}
 }

@@ -4,6 +4,7 @@ import java.util.Random;
 
 import celestibytes.magicandcorruption.pre.crafting.BoundSpellRecipes;
 import celestibytes.magicandcorruption.pre.crafting.NormalRecipes;
+import celestibytes.magicandcorruption.pre.crafting.RecipesConvert;
 import celestibytes.magicandcorruption.pre.crafting.RecipesTools;
 import celestibytes.magicandcorruption.pre.handler.StackCycles;
 import celestibytes.magicandcorruption.pre.init.ModBlocks;
@@ -64,6 +65,7 @@ public class MagicAndCorruptionPre {
 		
 		RecipesTools.init();
 		NormalRecipes.init();
+		RecipesConvert.init();
 		
 		RecipeSorter.register("mco_bound_spells", BoundSpellRecipes.class, Category.SHAPELESS, "");
 		GameRegistry.addRecipe(new BoundSpellRecipes());
@@ -89,7 +91,7 @@ public class MagicAndCorruptionPre {
 	
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent e) {
-		
+		NormalRecipes.doRecipeTweaks();
 	}
 	
 	@EventHandler

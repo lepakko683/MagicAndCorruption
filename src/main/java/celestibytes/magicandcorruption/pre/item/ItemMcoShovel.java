@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
 import celestibytes.magicandcorruption.pre.MagicAndCorruptionPre;
@@ -14,6 +15,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemSpade;
@@ -58,7 +61,7 @@ public class ItemMcoShovel extends ItemSpade implements IMcoTool {
 		shovelHeadIcons.put("shovel_head_iron", ir.registerIcon(Ref.MOD_ID + ":shovel_head_iron"));
 		shovelHeadIcons.put("shovel_head_gold", ir.registerIcon(Ref.MOD_ID + ":shovel_head_gold"));
 		shovelHeadIcons.put("shovel_head_diamond", ir.registerIcon(Ref.MOD_ID + ":shovel_head_diamond"));
-		super.registerIcons(ir);
+//		super.registerIcons(ir);
 	}
 	
 	@Override
@@ -122,6 +125,20 @@ public class ItemMcoShovel extends ItemSpade implements IMcoTool {
 	@Override
 	public Map<String, IIcon> getHeadIconsMap(ItemStack tool) {
 		return shovelHeadIcons;
+	}
+	
+	@Override
+	public float getAttackDamage(ItemStack stack, EntityLivingBase target, EntityLivingBase source) {
+		return 1f;
+	}
+	
+	@Override
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public Multimap getAttributeModifiers(ItemStack stack) {
+		Multimap map = super.getItemAttributeModifiers();
+		map.clear();
+		map.put(SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(), new AttributeModifier(field_111210_e, "Tool modifier", 1f + ToolHelper.getAttackDamage(stack), 0));
+		return map;
 	}
 
 }
